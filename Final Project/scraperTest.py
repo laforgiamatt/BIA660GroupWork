@@ -15,8 +15,19 @@ def requestBuilderTest():
 
 def driverBuilderTest():
     #TODO
+    #Assert Driver is built
 
 def randomLinkGeneratorTest():
+    #TODO
+    #Assert Link exists
+
+def myStripTest():
+    #TODO
+
+def scrapeCardTest():
+    #TODO
+
+def csvWriterTest():
     #TODO
 
 def runTest():
