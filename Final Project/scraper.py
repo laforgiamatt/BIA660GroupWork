@@ -59,13 +59,13 @@ def scrapeCard(cardPageText):
     cardData = {'cardName': None,
                 'cardCost': None,
                 'cardType': None,
+                'cardSubtypes': None,
                 'cardText': None}
 
     cardSoup = BeautifulSoup(cardPageText, 'lxml') 
     cardName = cardSoup.find('h1', {'class': 'card-text-title'})
     cardCost = cardSoup.find('span', {'class': 'card-text-mana-cost'})
-    cardType = cardSoup.find('p', {'class':'card-text-type-line'})
-    #TODO: Split out Subtypes   
+    cardType = cardSoup.find('p', {'class':'card-text-type-line'})   
     cardText = cardSoup.find('div', {'class':'card-text-oracle'})
     
     if cardName and cardCost:
@@ -83,7 +83,13 @@ def scrapeCard(cardPageText):
         if cardCost:
             cardData['cardCost'] = myStrip(cardCost)
     if cardType:
-        cardData['cardType'] = myStrip(cardType)
+        cardType = myStrip(cardType)
+        hasHyphen = cardType.find('—')
+        if hasHyphen == -1:
+            cardData['cardType'] = cardType
+        else:
+            cardData['cardType'] = cardType[0:hasHyphen].strip()
+            cardData['cardSubtypes'] = cardType[hasHyphen+1:len(cardType)].strip()
     if cardText:
         cardData['cardText'] = myStrip(cardText)
     
@@ -108,16 +114,17 @@ def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
     if checkDataParsed(dataFilename) and rebuildTraining==False:
         return
     else:
-        #TODO: if rebuild is true delete and restart file
+        if checkDataParsed(dataFilename) and rebuildTraining == True:
+            os.remove(dataFilename)
         for i in range(setSize):
             #TODO: Set up an already seen
             url = randomLinkGenerator()
             response = requestBuilder(url)
             cardData = scrapeCard(response.text)
             csvWriter(cardData, dataFilename)
-        print('Done')
+    print('Done')
 
 #run(setSize=1, rebuildTraining=False, dataFilename='authors.txt')
 #run(setSize=1, rebuildTraining=False)
 #run(setSize=1)
-run(setSize=5)
+run(setSize=7)
