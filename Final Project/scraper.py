@@ -11,14 +11,18 @@ import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
-#check if data exists
+#Project Imports
+import trainingDataParser as tDP
+#from tDP import fullFileReader
+
+
 def checkDataParsed(filename):
     if os.path.exists(filename):
         return True
     else:
         return False
 
-#scrape data (10 000 random sources)
+
 def driverBuilder(url):
     driver = webdriver.Chrome('./chromedriver')
     driver.get(url)
@@ -34,7 +38,7 @@ def randomLinkGenerator():
     driver.quit()
     return url
 
-#try and build url request
+
 def requestBuilder(url):
     for i in range(5):
         response=requests.get(url,headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36', })
@@ -49,11 +53,11 @@ def requestBuilder(url):
         return response
 
  
-#scrape data individual data
 def myStrip(scrapedData):
     cleanText = scrapedData.text.strip()
 
     return cleanText 
+
 
 def scrapeCard(cardPageText):
     cardData = {'cardName': None,
@@ -95,6 +99,7 @@ def scrapeCard(cardPageText):
     
     return cardData
 
+
 def csvWriter(cardData, dataFilename):
     if not checkDataParsed(dataFilename):
         with open(dataFilename, 'w', encoding='utf8') as outfile:
@@ -107,20 +112,25 @@ def csvWriter(cardData, dataFilename):
 
     return
 
-#possible json helper function
-
 
 def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
+    alreadyScrapedSet = set()
     if checkDataParsed(dataFilename) and rebuildTraining==False:
         return
     else:
         if checkDataParsed(dataFilename) and rebuildTraining == True:
             os.remove(dataFilename)
         for i in range(setSize):
-            #TODO: Set up an already seen
             url = randomLinkGenerator()
             response = requestBuilder(url)
             cardData = scrapeCard(response.text)
+            print('Scraping ' + cardData['cardName'])
+            if checkDataParsed(dataFilename):    
+                alreadyScrapedSet = tDP.fullFileReader(dataFilename)
+            if set(cardData) in alreadyScrapedSet:
+                print('Already seen ' + cardData['cardName'])
+                i = i-1
+                continue
             csvWriter(cardData, dataFilename)
     print('Done')
 
