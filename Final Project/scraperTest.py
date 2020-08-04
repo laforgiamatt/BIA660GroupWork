@@ -1,3 +1,4 @@
+
 """
 unit tests for scraper
 """
@@ -12,9 +13,12 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import scraper as myScraper
 
-dataFilename='trainingCards.txt'
-url = myScraper.randomLinkGenerator()
+
+dataFilename='test_trainingCards.txt'
+#Test Url
+url = 'https://scryfall.com/card/bng/135/raised-by-wolves'
 response = myScraper.requestBuilder(url)
+cardData = myScraper.scrapeCard(response.text)
 
 def checkDataParsedTest():
     assert myScraper.checkDataParsed('authors.txt') == True
@@ -23,38 +27,39 @@ def requestBuilderTest():
     assert myScraper.requestBuilder('http://www.google.com').status_code == 200
 
 def driverBuilderTest():
-#   TODO
 #   Assert Driver is built
     driver.get('https://www.w3schools.com/html/html_examples.asp')
     print(driver.title)
     assert driver.title == 'HTML Examples'
 
 def randomLinkGeneratorTest():
-    #TODO
     #Assert Link exists
     assert myScraper.randomLinkGenerator()=="https://scryfall.com/random"
 
 def myStripTest():
-    #TODO
     htmltxt = "<p>Hello World</p>"
     soup = BeautifulSoup(htmltxt, 'lxml')
     assert myScraper.myStrip(soup) == 'Hello World'
 
 def scrapeCardTest():
-   #TODO
+    assert len(cardData['cardName'])>1
+    assert len(cardData['cardType'])>1
+    #assert len(cardData['cardText'])>1
+
+def csvWriterTest():
     cardData = myScraper.scrapeCard(response.text)
     assert len(cardData['cardName'])>1
     assert len(cardData['cardType'])>1
     assert len(cardData['cardText'])>1
 
 def csvWriterTest():
-   #TODO
     myScraper.csvWriter(cardData, dataFilename)
     assert myScraper.checkDataParsed(dataFilename)==True
 
 def runTest():
 #     myScraper.run()
-    fname = 'trainingCards.txt'
+    fname = 'test_trainingCards.txt'
+
     with open(fname) as f:
         for i, l in enumerate(f):
             pass
