@@ -13,7 +13,6 @@ from selenium import webdriver
 
 #Project Imports
 import trainingDataParser as tDP
-#from tDP import fullFileReader
 
 
 def checkDataParsed(filename):
@@ -124,17 +123,17 @@ def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
             url = randomLinkGenerator()
             response = requestBuilder(url)
             cardData = scrapeCard(response.text)
-            print('Scraping ' + cardData['cardName'])
             if checkDataParsed(dataFilename):    
                 alreadyScrapedSet = tDP.fullFileReader(dataFilename)
-            if set(cardData) in alreadyScrapedSet:
-                print('Already seen ' + cardData['cardName'])
-                i = i-1
-                continue
+                if set(cardData) in alreadyScrapedSet:
+                    print('Already seen ' + cardData['cardName'])
+                    i = i-1
+                    continue
+            print('Scraping ' + cardData['cardName'])
             csvWriter(cardData, dataFilename)
     print('Done')
 
 #run(setSize=1, rebuildTraining=False, dataFilename='authors.txt')
 #run(setSize=1, rebuildTraining=False)
 #run(setSize=1)
-run(setSize=7)
+run(setSize=10000)
