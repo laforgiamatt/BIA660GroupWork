@@ -13,8 +13,8 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import scraper as myScraper
 
-dataFilename='test_trainingCards.txt'
 
+dataFilename='test_trainingCards.txt'
 #Test Url
 url = 'https://scryfall.com/card/bng/135/raised-by-wolves'
 response = myScraper.requestBuilder(url)
@@ -47,12 +47,19 @@ def scrapeCardTest():
     #assert len(cardData['cardText'])>1
 
 def csvWriterTest():
+    cardData = myScraper.scrapeCard(response.text)
+    assert len(cardData['cardName'])>1
+    assert len(cardData['cardType'])>1
+    assert len(cardData['cardText'])>1
+
+def csvWriterTest():
     myScraper.csvWriter(cardData, dataFilename)
     assert myScraper.checkDataParsed(dataFilename)==True
 
 def runTest():
 #     myScraper.run()
     fname = 'test_trainingCards.txt'
+
     with open(fname) as f:
         for i, l in enumerate(f):
             pass
