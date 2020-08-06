@@ -11,14 +11,17 @@ import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
-#check if data exists
+#Project Imports
+import trainingDataParser as tDP
+
+
 def checkDataParsed(filename):
     if os.path.exists(filename):
         return True
     else:
         return False
 
-#scrape data (10 000 random sources)
+
 def driverBuilder(url):
     driver = webdriver.Chrome('./chromedriver')
     driver.get(url)
@@ -34,7 +37,7 @@ def randomLinkGenerator():
     driver.quit()
     return url
 
-#try and build url request
+
 def requestBuilder(url):
     for i in range(5):
         response=requests.get(url,headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36', })
@@ -49,23 +52,23 @@ def requestBuilder(url):
         return response
 
  
-#scrape data individual data
 def myStrip(scrapedData):
     cleanText = scrapedData.text.strip()
 
     return cleanText 
 
+
 def scrapeCard(cardPageText):
     cardData = {'cardName': None,
                 'cardCost': None,
                 'cardType': None,
+                'cardSubtypes': None,
                 'cardText': None}
 
     cardSoup = BeautifulSoup(cardPageText, 'lxml') 
     cardName = cardSoup.find('h1', {'class': 'card-text-title'})
     cardCost = cardSoup.find('span', {'class': 'card-text-mana-cost'})
-    cardType = cardSoup.find('p', {'class':'card-text-type-line'})
-    #TODO: Split out Subtypes   
+    cardType = cardSoup.find('p', {'class':'card-text-type-line'})   
     cardText = cardSoup.find('div', {'class':'card-text-oracle'})
     
     if cardName and cardCost:
@@ -83,11 +86,18 @@ def scrapeCard(cardPageText):
         if cardCost:
             cardData['cardCost'] = myStrip(cardCost)
     if cardType:
-        cardData['cardType'] = myStrip(cardType)
+        cardType = myStrip(cardType)
+        hasHyphen = cardType.find('—')
+        if hasHyphen == -1:
+            cardData['cardType'] = cardType
+        else:
+            cardData['cardType'] = cardType[0:hasHyphen].strip()
+            cardData['cardSubtypes'] = cardType[hasHyphen+1:len(cardType)].strip()
     if cardText:
         cardData['cardText'] = myStrip(cardText)
     
     return cardData
+
 
 def csvWriter(cardData, dataFilename):
     if not checkDataParsed(dataFilename):
@@ -101,23 +111,29 @@ def csvWriter(cardData, dataFilename):
 
     return
 
-#possible json helper function
-
 
 def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
+    alreadyScrapedSet = set()
     if checkDataParsed(dataFilename) and rebuildTraining==False:
         return
     else:
-        #TODO: if rebuild is true delete and restart file
+        if checkDataParsed(dataFilename) and rebuildTraining == True:
+            os.remove(dataFilename)
         for i in range(setSize):
-            #TODO: Set up an already seen
             url = randomLinkGenerator()
             response = requestBuilder(url)
             cardData = scrapeCard(response.text)
+            if checkDataParsed(dataFilename):    
+                alreadyScrapedSet = tDP.fullFileReader(dataFilename)
+                if set(cardData) in alreadyScrapedSet:
+                    print('Already seen ' + cardData['cardName'])
+                    i = i-1
+                    continue
+            print('Scraping ' + cardData['cardName'])
             csvWriter(cardData, dataFilename)
-        print('Done')
+    print('Done')
 
 #run(setSize=1, rebuildTraining=False, dataFilename='authors.txt')
 #run(setSize=1, rebuildTraining=False)
 #run(setSize=1)
-run(setSize=5)
+run(setSize=10000)
