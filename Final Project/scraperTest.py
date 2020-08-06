@@ -5,6 +5,7 @@ unit tests for scraper
 #import response
 import unittest
 
+#Project Imports
 import scraper as myScraper
 
 def checkDataParsedTest():
