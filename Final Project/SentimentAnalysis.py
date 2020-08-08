@@ -1,14 +1,15 @@
 
 import ast
-f = open("trainingCards.txt")
-no_of_cards = [i for i in f]
+def cardBlend(fname):
+    f = open(fname)
+    no_of_cards = [i for i in f]
 
-op = [ast.literal_eval(i[1:-2]) for i in no_of_cards]
-final = [str(i['cardType'])+' '+str(i['cardText']) for i in op]
-w = open('cardsblend.txt', 'w')
-for i in final:
-    w.write(i+'\n')
-w.close()
+    op = [ast.literal_eval(i[1:-2]) for i in no_of_cards]
+    final = [str(i['cardType'])+' '+str(i['cardText']) for i in op]
+    w = open('cardsblend.txt', 'w')
+    for i in final:
+        w.write(i+'\n')
+    w.close()
 
 def loadLexicon(fname):
     newLex=set()
@@ -55,6 +56,7 @@ def run(path):
 
 
 if __name__ == "__main__":
+    cardBlend("trainingCards.txt")
     carddata,decisions= run('cardblend.txt')
     for i in range(len(carddata)):
         print(carddata[i], decisions[i])
