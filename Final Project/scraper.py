@@ -46,16 +46,16 @@ def requestBuilder(url):
         else:
             time.sleep(2)
 
-    if not response: 
+    if not response:
         return None
     else:
         return response
 
- 
+
 def myStrip(scrapedData):
     cleanText = scrapedData.text.strip()
-
-    return cleanText 
+    cleanText = cleanText.replace("'","")
+    return cleanText
 
 
 def scrapeCard(cardPageText):
@@ -65,12 +65,12 @@ def scrapeCard(cardPageText):
                 'cardSubtypes': None,
                 'cardText': None}
 
-    cardSoup = BeautifulSoup(cardPageText, 'lxml') 
+    cardSoup = BeautifulSoup(cardPageText, 'lxml')
     cardName = cardSoup.find('h1', {'class': 'card-text-title'})
     cardCost = cardSoup.find('span', {'class': 'card-text-mana-cost'})
-    cardType = cardSoup.find('p', {'class':'card-text-type-line'})   
+    cardType = cardSoup.find('p', {'class':'card-text-type-line'})
     cardText = cardSoup.find('div', {'class':'card-text-oracle'})
-    
+
     if cardName and cardCost:
         cardName = myStrip(cardName)
         cardCost = myStrip(cardCost)
@@ -95,7 +95,7 @@ def scrapeCard(cardPageText):
             cardData['cardSubtypes'] = cardType[hasHyphen+1:len(cardType)].strip()
     if cardText:
         cardData['cardText'] = myStrip(cardText)
-    
+
     return cardData
 
 
@@ -123,7 +123,7 @@ def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
             url = randomLinkGenerator()
             response = requestBuilder(url)
             cardData = scrapeCard(response.text)
-            if checkDataParsed(dataFilename):    
+            if checkDataParsed(dataFilename):
                 alreadyScrapedSet = tDP.fullFileReader(dataFilename)
                 if set(cardData) in alreadyScrapedSet:
                     print('Already seen ' + cardData['cardName'])
