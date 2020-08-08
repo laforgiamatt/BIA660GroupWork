@@ -57,6 +57,6 @@ def run(path):
 
 if __name__ == "__main__":
     cardBlend("trainingCards.txt")
-    carddata,decisions= run('cardblend.txt')
+    carddata,decisions= run('cardsblend.txt')
     for i in range(len(carddata)):
         print(carddata[i], decisions[i])
