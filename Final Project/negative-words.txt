@@ -1,4 +1,0 @@
-destroy
-remove
-exile
-
