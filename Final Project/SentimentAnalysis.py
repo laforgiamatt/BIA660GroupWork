@@ -1,15 +1,5 @@
-
 import ast
-def cardBlend(fname):
-    f = open(fname)
-    no_of_cards = [i for i in f]
-
-    op = [ast.literal_eval(i[1:-2]) for i in no_of_cards]
-    final = [str(i['cardType'])+' '+str(i['cardText']) for i in op]
-    w = open('cardsblend.txt', 'w')
-    for i in final:
-        w.write(i+'\n')
-    w.close()
+import json
 
 def loadLexicon(fname):
     newLex=set()
@@ -20,16 +10,14 @@ def loadLexicon(fname):
     lex_conn.close()
     return newLex
 
-#function that reads in a file with carddata and decides if each card is good or bad
-def run(path):
+def run(final):
     decisions=[]
     carddata=[]
     #load the positive and negative lexicons
     goodLex=loadLexicon('positive-words.txt')
     badLex=loadLexicon('negative-words.txt')
 
-    fin=open(path)
-    for line in fin: # for every line in the file (1 review per line)
+    for line in final: # for every line in the file (1 review per line)
         goodList=[] #list of good words in the review
         badList=[] #list of bad words in the review
 
@@ -51,12 +39,14 @@ def run(path):
             decision=-1 # -1 for negative
         decisions.append(decision)
 
-    fin.close()
     return carddata, decisions
 
 
 if __name__ == "__main__":
-    cardBlend("trainingCards.txt")
-    carddata,decisions= run('cardsblend.txt')
+    f = open('trainingCards.txt')
+    no_of_cards = [i for i in f]
+    op = [ast.literal_eval(i[1:-2]) for i in no_of_cards]
+    final = [str(i['cardType'])+' '+str(i['cardText']) for i in op]
+    carddata,decisions= run(final)
     for i in range(len(carddata)):
         print(carddata[i], decisions[i])
