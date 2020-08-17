@@ -10,7 +10,8 @@ def loadLexicon(fname):
     lex_conn.close()
     return newLex
 
-def run(final):
+
+def analysis(final):
     decisions=[]
     carddata=[]
     #load the positive and negative lexicons
@@ -42,11 +43,16 @@ def run(final):
     return carddata, decisions
 
 
-if __name__ == "__main__":
+def finalBuilder():
     f = open('trainingCards.txt')
     no_of_cards = [i for i in f]
     op = [ast.literal_eval(i[1:-2]) for i in no_of_cards]
     final = [str(i['cardType'])+' '+str(i['cardText']) for i in op]
-    carddata,decisions= run(final)
+    return final
+    
+
+def run():
+    final = finalBuilder()
+    carddata,decisions= analysis(final)
     for i in range(len(carddata)):
         print(carddata[i], decisions[i])

@@ -14,7 +14,6 @@ from selenium import webdriver
 #Project Imports
 import trainingDataParser as tDP
 
-
 def checkDataParsed(filename):
     if os.path.exists(filename):
         return True
@@ -131,8 +130,3 @@ def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
             print('Scraping ' + cardData['cardName'])
             csvWriter(cardData, dataFilename)
     print('Done')
-
-#run(setSize=1, rebuildTraining=False, dataFilename='authors.txt')
-#run(setSize=1, rebuildTraining=False)
-#run(setSize=1)
-run(setSize=10000)
