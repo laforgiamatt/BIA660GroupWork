@@ -1,5 +1,6 @@
 import ast
 import json
+import pandas as pd
 
 def loadLexicon(fname):
     newLex=set()
@@ -9,7 +10,6 @@ def loadLexicon(fname):
         newLex.add(line.strip())# remember to strip to remove the lin-change character
     lex_conn.close()
     return newLex
-
 
 def analysis(final):
     decisions=[]
@@ -42,17 +42,22 @@ def analysis(final):
 
     return carddata, decisions
 
-
 def finalBuilder():
     f = open('trainingCards.txt')
     no_of_cards = [i for i in f]
     op = [ast.literal_eval(i[1:-2]) for i in no_of_cards]
     final = [str(i['cardType'])+' '+str(i['cardText']) for i in op]
     return final
-    
+
+def dataframebuilder(carddata,decisions):
+    df = pd.DataFrame()
+    for i in range(len(carddata)):
+        df['Carddata'] = list(carddata)
+        df['Decisions'] = list(decisions)
+        return df
 
 def run():
     final = finalBuilder()
     carddata,decisions= analysis(final)
-    for i in range(len(carddata)):
-        print(carddata[i], decisions[i])
+    df = dataframebuilder(carddata,decisions)
+    return df
