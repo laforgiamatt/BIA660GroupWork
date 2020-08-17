@@ -113,7 +113,7 @@ def csvWriter(cardData, dataFilename):
 
 
 def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
-    alreadyScrapedSet = set()
+    alreadySeen = set()
     if checkDataParsed(dataFilename) and rebuildTraining==False:
         return
     else:
@@ -123,12 +123,11 @@ def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
             url = randomLinkGenerator()
             response = requestBuilder(url)
             cardData = scrapeCard(response.text)
-            if checkDataParsed(dataFilename):
-                alreadyScrapedSet = tDP.fullFileReader(dataFilename)
-                if set(cardData) in alreadyScrapedSet:
-                    print('Already seen ' + cardData['cardName'])
-                    i = i-1
-                    continue
+            if cardData['cardName'] in alreadySeen:
+                print('Already seen ' + cardData['cardName'])
+                i = i-1
+                continue
+            alreadySeen.add(cardData['cardName'])
             print('Scraping ' + cardData['cardName'])
             csvWriter(cardData, dataFilename)
     print('Done')
