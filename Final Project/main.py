@@ -9,6 +9,7 @@ import sys
 
 import scraper as Scraper
 import SentimentAnalysis as SentimentAnalysis
+import neuralnetwork as Neuralnetwork
 
 def main():
     params = sys.argv[1:]
@@ -19,6 +20,8 @@ def main():
         Scraper.run(setSize=numberofcards)
     
     SentimentAnalysis.run()
+
+    Neuralnetwork.run()
 
 if __name__ == "__main__":
     main()

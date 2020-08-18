@@ -86,4 +86,5 @@ def model():
     print("Score:", score[0])
     print("Test Accuracy:", score[1])
     
-model()
+def run():
+    model()
