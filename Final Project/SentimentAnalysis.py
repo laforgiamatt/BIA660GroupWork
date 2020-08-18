@@ -60,4 +60,6 @@ def run():
     final = finalBuilder()
     carddata,decisions= analysis(final)
     df = dataframebuilder(carddata,decisions)
+    print('Sentiment analysis')
+    print(df)
     return df
