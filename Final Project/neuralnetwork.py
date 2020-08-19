@@ -6,9 +6,15 @@ import re
 import nltk
 from nltk.corpus import stopwords
 from numpy import array
+from keras import optimizers
 from keras.layers.core import Activation, Dropout, Dense
 from keras.layers import Flatten
 from keras.layers import GlobalMaxPooling1D
+from keras.layers import Conv2D
+from keras.layers import Conv1D
+from keras.layers import MaxPooling1D
+from keras.layers import BatchNormalization
+from keras.layers import Dropout
 from keras.layers.embeddings import Embedding
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.text import one_hot
@@ -75,13 +81,22 @@ def model():
 
     model = Sequential()
     embedding_layer = Embedding(vocab_size, 300, weights=[embedding_matrix], input_length=maxlen , trainable=False)
+    #model.add(Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=(32, 32, 3)))
     model.add(embedding_layer)
-    model.add(Flatten())
+    model.add(Conv1D(32, kernel_size=3, activation='tanh'))
+    model.add(MaxPooling1D(pool_size=2))
     model.add(Dense(1, activation='sigmoid'))
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
+    model.add(BatchNormalization())
+    model.add(Dropout(.32))
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+
+    learning_rate = 1E-4
+    model.compile(optimizer=optimizers.RMSprop(lr=learning_rate), loss='binary_crossentropy', metrics=["acc"])
 
     print(model.summary())
-    history = model.fit(X_train, y_train, batch_size=128, epochs=6, verbose=1, validation_split=0.2)
+    history = model.fit(X_train, y_train, batch_size=32, epochs=64, verbose=1, validation_split=0.2)
     score = model.evaluate(X_test, y_test, verbose=1)
     print("Score:", score[0])
     print("Test Accuracy:", score[1])
