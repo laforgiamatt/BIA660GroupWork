@@ -111,22 +111,29 @@ def csvWriter(cardData, dataFilename):
     return
 
 
-def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000):
+def scrapeFunctions(dataFilename, setSize):
     alreadySeen = set()
-    if checkDataParsed(dataFilename) and rebuildTraining==False:
+    for i in range(setSize):
+        url = randomLinkGenerator()
+        response = requestBuilder(url)
+        cardData = scrapeCard(response.text)
+        if cardData['cardName'] in alreadySeen:
+            print('Already seen ' + cardData['cardName'])
+            i = i-1
+            continue
+        alreadySeen.add(cardData['cardName'])
+        print('Scraping ' + cardData['cardName'])
+        csvWriter(cardData, dataFilename)
+
+    return
+
+def run(dataFilename='trainingCards.txt', rebuildTraining=True, setSize=10000, scrapeMore=False):
+    if checkDataParsed(dataFilename) and rebuildTraining==False and scrapeMore == False:
         return
     else:
-        if checkDataParsed(dataFilename) and rebuildTraining == True:
+        if checkDataParsed(dataFilename) and rebuildTraining == True and scapeMore == False:
             os.remove(dataFilename)
-        for i in range(setSize):
-            url = randomLinkGenerator()
-            response = requestBuilder(url)
-            cardData = scrapeCard(response.text)
-            if cardData['cardName'] in alreadySeen:
-                print('Already seen ' + cardData['cardName'])
-                i = i-1
-                continue
-            alreadySeen.add(cardData['cardName'])
-            print('Scraping ' + cardData['cardName'])
-            csvWriter(cardData, dataFilename)
+            scrapeFunctions(dataFilename, setSize)
+        if checkDataParsed(dataFilename) and scrapeMore == True:
+            scrapeFunctions(dataFilename, setSize)
     print('Done')

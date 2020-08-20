@@ -1,4 +1,10 @@
 destroy
 remove
 exile
-
+-
+counter
+lose
+mill
+can't
+more
+opponent
