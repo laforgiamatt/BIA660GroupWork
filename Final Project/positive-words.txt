@@ -1,3 +1,10 @@
 land
 enchantment
 artifact
++
+creature
+planeswalker
+instant
+sorcery
+gain
+scry
